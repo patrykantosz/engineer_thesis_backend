@@ -25,7 +25,7 @@ SECRET_KEY = ')o5!j@t^$1lier+=_la&p6m%mm-q5=0l)&%l)!^z(pwb1_oziw'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['backendforthesis.herokuapp.com']
 
 
 # Application definition
