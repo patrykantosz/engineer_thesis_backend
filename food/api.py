@@ -17,7 +17,7 @@ class AddFoodAPI(APIView):
 
 class ListFoodAPI(generics.ListAPIView):
     permission_classes = [
-        permissions.IsAuthenticated,
+        permissions.AllowAny,
     ]
     queryset = Food.objects.all()
     serializer_class = FoodSerializer
