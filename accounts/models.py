@@ -14,14 +14,15 @@ class MealType(ChoiceEnum):
 
 
 class Meal(models.Model):
-    food = models.ForeignKey(Food, on_delete=models.CASCADE)
-    meal_type = EnumChoiceField(enum_class=MealType)
+    food = models.ForeignKey(Food, on_delete=models.CASCADE, null=True)
+    meal_type = EnumChoiceField(enum_class=MealType, null=True)
 
 
 class UserFoodHistory(models.Model):
-    meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
-    date = models.DateField(default=timezone.now())
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE, null=True)
+    date = models.DateField(default=timezone.now(), null=True)
 
 
 class AppUser(User):
-    food_history = models.ForeignKey(UserFoodHistory, on_delete=models.CASCADE)
+    food_history = models.ForeignKey(
+        UserFoodHistory, on_delete=models.CASCADE, null=True)

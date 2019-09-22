@@ -19,5 +19,11 @@ class ListFoodAPI(generics.ListAPIView):
     permission_classes = [
         permissions.AllowAny,
     ]
-    queryset = Food.objects.all()
     serializer_class = FoodSerializer
+
+    def get_queryset(self):
+        queryset = Food.objects.all()
+        if(self.request.query_params):
+            food_name = self.request.query_params.get('food_name', '')
+            return queryset.filter(name__icontains=food_name)
+        return queryset
