@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from food.models import Food
 from enumchoicefield import ChoiceEnum, EnumChoiceField
@@ -14,15 +14,22 @@ class MealType(ChoiceEnum):
 
 
 class Meal(models.Model):
-    food = models.ForeignKey(Food, on_delete=models.CASCADE, null=True)
+    food = models.ManyToManyField(Food, through='FoodDetails')
     meal_type = EnumChoiceField(enum_class=MealType, null=True)
 
 
+class FoodDetails(models.Model):
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
+    food = models.ForeignKey(Food, on_delete=models.CASCADE)
+    food_weight = models.DecimalField(
+        max_digits=6, decimal_places=3, default=100)
+
+
 class UserFoodHistory(models.Model):
-    meal = models.ForeignKey(Meal, on_delete=models.CASCADE, null=True)
-    date = models.DateField(default=timezone.now(), null=True)
+    meal = models.ManyToManyField(Meal)
+    date = models.DateField(default=timezone.now, null=True)
 
 
-class AppUser(User):
+class AppUser(AbstractUser):
     food_history = models.ForeignKey(
         UserFoodHistory, on_delete=models.CASCADE, null=True)

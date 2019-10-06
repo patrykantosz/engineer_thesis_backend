@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'knox',
 ]
 
+AUTH_USER_MODEL = 'accounts.AppUser'
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':
     ('knox.auth.TokenAuthentication',)
