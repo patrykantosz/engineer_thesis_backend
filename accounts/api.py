@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, MealSerializer, UserFoodHistorySerializer
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FoodDetailsSerializer, MealSerializer, UserFoodHistorySerializer
 from .models import AppUser, MealType, FoodDetails, Meal, MealDate
 from food.models import Food
 from food.serializer import FoodSerializer
@@ -130,13 +130,15 @@ class AddMealAPI(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class DeleteFoodProductFromMeal(generics.DestroyAPIView):
+class DeleteFoodProductFromMealAPI(generics.DestroyAPIView):
     permission_classes = [
         permissions.IsAuthenticated,
     ]
 
     def delete(self, request, *args, **kwargs):
         food_details_id = request.data.get('food_details_id', False)
-        meal_id = request.data.get('meal_id', False)
-        user = self.request.user
-        user_history = user.food_history
+        food_details_object = FoodDetails.objects.get(pk=food_details_id)
+        if(food_details_object):
+            serializer = FoodDetailsSerializer(food_details_object)
+            food_details_object.delete()
+        return Response(serializer.data, status=status.HTTP_200_OK)
