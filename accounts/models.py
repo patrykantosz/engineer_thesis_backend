@@ -12,6 +12,21 @@ class MealType(ChoiceEnum):
     LN = "Lunch"
     SU = "Supper"
 
+    @staticmethod
+    def get(meal_type):
+        if(meal_type == "Breakfast"):
+            return MealType.BF
+        elif(meal_type == "Brunch"):
+            return MealType.BR
+        elif(meal_type == "Dinner"):
+            return MealType.DN
+        elif(meal_type == "Lunch"):
+            return MealType.LN
+        elif(meal_type == "Supper"):
+            return MealType.SU
+        else:
+            raise Exception('InvalidValue', 'Invalid value of MealType')
+
 
 class Meal(models.Model):
     food = models.ManyToManyField(Food, through='FoodDetails')
@@ -26,8 +41,14 @@ class FoodDetails(models.Model):
 
 
 class UserFoodHistory(models.Model):
-    meal = models.ManyToManyField(Meal)
-    date = models.DateField(default=timezone.now, null=True)
+    meal = models.ManyToManyField(Meal, through='MealDate')
+
+
+class MealDate(models.Model):
+    user_food_history = models.ForeignKey(
+        UserFoodHistory, on_delete=models.CASCADE)
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
+    meal_date = models.DateField(default=timezone.now, null=True)
 
 
 class AppUser(AbstractUser):

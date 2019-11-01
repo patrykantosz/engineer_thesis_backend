@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import AppUser, UserFoodHistory, Meal, FoodDetails
+from .models import AppUser, UserFoodHistory, Meal, FoodDetails, MealDate
 from food.serializer import FoodSerializer
 from django.core import serializers as coreserializers
 from food.models import Food
@@ -22,8 +22,16 @@ class MealSerializer(serializers.ModelSerializer):
         fields = ('id', 'meal_type', 'food')
 
 
+class MealDateSerializer(serializers.ModelSerializer):
+    meal = serializers.ReadOnlyField(source='meal.id')
+
+    class Meta:
+        model = MealDate
+        fields = ('id', 'meal', 'meal_date')
+
+
 class UserFoodHistorySerializer(serializers.ModelSerializer):
-    meal = MealSerializer(many=True)
+    meal = MealDateSerializer(source='mealdate_set', many=True)
 
     class Meta:
         model = UserFoodHistory
