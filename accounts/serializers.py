@@ -4,34 +4,47 @@ from .models import AppUser, UserFoodHistory, Meal, FoodDetails, MealDate
 from food.serializer import FoodSerializer
 from django.core import serializers as coreserializers
 from food.models import Food
+from django.db.models.query import QuerySet
 
 
-class FoodDetailsSerializer(serializers.ModelSerializer):
-    food = serializers.ReadOnlyField(source='food.id')
+class FoodDetailsSerializer(serializers.RelatedField):
+    def to_representation(self, value):
+        if type(self.root.instance) == QuerySet:
+            self.root.instance = self.root.instance[0]
+        food_details = FoodDetails.objects.filter(
+            food=value, meal=self.root.instance).first()
+        food_weight = food_details.food_weight
+        value = FoodSerializer(value)
+        serialized_food_data = value.data
+        serialized_food_data['food_weight'] = str(food_weight)
 
-    class Meta:
-        model = FoodDetails
-        fields = ('id', 'food', 'food_weight')
+        return serialized_food_data
 
 
 class MealSerializer(serializers.ModelSerializer):
-    food = FoodDetailsSerializer(source='fooddetails_set', many=True)
+    food = FoodDetailsSerializer(many=True, read_only=True)
 
     class Meta:
         model = Meal
         fields = ('id', 'meal_type', 'food')
 
 
-class MealDateSerializer(serializers.ModelSerializer):
-    meal = serializers.ReadOnlyField(source='meal.id')
+class MealDateSerializer(serializers.RelatedField):
+    def to_representation(self, value):
+        if type(self.root.instance) == QuerySet:
+            self.root.instance = self.root.instance[0]
+        meal_date_object = MealDate.objects.filter(
+            meal=value, user_food_history=self.root.instance).first()
+        meal_date = meal_date_object.meal_date
+        value = MealSerializer(value)
+        serialized_meal_data = value.data
+        serialized_meal_data['meal_date'] = str(meal_date)
 
-    class Meta:
-        model = MealDate
-        fields = ('id', 'meal', 'meal_date')
+        return serialized_meal_data
 
 
 class UserFoodHistorySerializer(serializers.ModelSerializer):
-    meal = MealDateSerializer(source='mealdate_set', many=True)
+    meal = MealDateSerializer(many=True, read_only=True)
 
     class Meta:
         model = UserFoodHistory
