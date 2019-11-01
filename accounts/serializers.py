@@ -16,6 +16,7 @@ class FoodDetailsSerializer(serializers.RelatedField):
         food_weight = food_details.food_weight
         value = FoodSerializer(value)
         serialized_food_data = value.data
+        serialized_food_data['food_details_id'] = str(food_details.id)
         serialized_food_data['food_weight'] = str(food_weight)
 
         return serialized_food_data
@@ -38,6 +39,7 @@ class MealDateSerializer(serializers.RelatedField):
         meal_date = meal_date_object.meal_date
         value = MealSerializer(value)
         serialized_meal_data = value.data
+        serialized_meal_data['meal_date_id'] = str(meal_date_object.id)
         serialized_meal_data['meal_date'] = str(meal_date)
 
         return serialized_meal_data
