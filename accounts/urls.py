@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .api import RegisterAPI, LoginAPI, UserAPI, AddMealAPI, MealListAPI, UserFoodHistoryObjectAPI, MealRetrieveAPI, DeleteFoodProductFromMealAPI
+from .api import RegisterAPI, LoginAPI, UserAPI, AddMealAPI, MealListAPI, UserFoodHistoryObjectAPI, MealRetrieveAPI, DeleteFoodProductFromMealAPI, FoodDetailsUpdateAPI
 from knox import views as knox_views
 
 urlpatterns = [
@@ -15,5 +15,7 @@ urlpatterns = [
     path('api/auth/food_history/list', UserFoodHistoryObjectAPI.as_view(),
          name="list-food-history-endpoint"),
     path('api/auth/meal/delete', DeleteFoodProductFromMealAPI.as_view(),
-         name="meal-delete-food")
+         name="meal-delete-food"),
+    path('api/auth/food_details/update', FoodDetailsUpdateAPI.as_view(),
+         name="food-detail-update-endpoint"),
 ]

@@ -78,6 +78,25 @@ class UserFoodHistoryObjectAPI(generics.RetrieveAPIView):
         return self.request.user.food_history
 
 
+class FoodDetailsUpdateAPI(generics.UpdateAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    serializer_class = MealSerializer
+    queryset = FoodDetails.objects.all()
+
+    def partial_update(self, request, *args, **kwargs):
+        food_weight = request.data.get('food_weight', False)
+        food_details_id = request.data.get('food_details_id', False)
+        instance = FoodDetails.objects.get(pk=food_details_id)
+        instance.food_weight = food_weight
+        instance.save()
+        if(instance.food_weight == food_weight):
+            return Response(status=status.HTTP_200_OK)
+        return Response('Update failed', status=status.HTTP_404_NOT_FOUND)
+
+
 class AddMealAPI(generics.GenericAPIView):
     permission_classes = [
         permissions.IsAuthenticated,
@@ -103,19 +122,21 @@ class AddMealAPI(generics.GenericAPIView):
         meals_by_meal_type = self.request.user.food_history.meal.filter(
             meal_type=meal_type_enum)
         if(len(meals_by_meal_type) != 0):
+            object_created = False
             for meal_by_type in meals_by_meal_type:
                 meal_to_get_date = self.request.user.food_history.mealdate_set.get(
                     meal=meal_by_type)
                 if(meal_to_get_date.meal_date == meal_date):
                     food_final = FoodDetails(
                         meal=meal_by_type, food=food, food_weight=food_weight)
-                else:
-                    meal = Meal.objects.create(meal_type=meal_type_enum)
-                    food_final = FoodDetails(
-                        meal=meal, food=food, food_weight=food_weight)
-                    meal_final = MealDate(
-                        user_food_history=user_history, meal=meal, meal_date=meal_date)
-                    meal_final.save()
+                    object_created = True
+            if(not object_created):
+                meal = Meal.objects.create(meal_type=meal_type_enum)
+                food_final = FoodDetails(
+                    meal=meal, food=food, food_weight=food_weight)
+                meal_final = MealDate(
+                    user_food_history=user_history, meal=meal, meal_date=meal_date)
+                meal_final.save()
         else:
             meal = Meal.objects.create(meal_type=meal_type_enum)
             food_final = FoodDetails(
@@ -125,7 +146,6 @@ class AddMealAPI(generics.GenericAPIView):
             meal_final.save()
 
         food_final.save()
-
         serializer = UserFoodHistorySerializer(user_history)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -139,6 +159,6 @@ class DeleteFoodProductFromMealAPI(generics.DestroyAPIView):
         food_details_id = request.data.get('food_details_id', False)
         food_details_object = FoodDetails.objects.get(pk=food_details_id)
         if(food_details_object):
-            serializer = FoodDetailsSerializer(food_details_object)
+            #serializer = FoodDetailsSerializer(food_details_object)
             food_details_object.delete()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
