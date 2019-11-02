@@ -61,6 +61,8 @@ class MealDateSerializer(serializers.RelatedField):
         serialized_meal_data = value.data
         serialized_meal_data['meal_date_id'] = str(meal_date_object.id)
         serialized_meal_data['meal_date'] = str(meal_date)
+        serialized_meal_data.move_to_end('meal_date_id', last=False)
+        serialized_meal_data.move_to_end('meal_date', last=False)
 
         return serialized_meal_data
 
