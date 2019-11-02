@@ -8,16 +8,34 @@ from django.db.models.query import QuerySet
 
 
 class FoodDetailsSerializer(serializers.RelatedField):
+
+    previous = []
+    index = 0
+
     def to_representation(self, value):
+        self.index += 1
         if type(self.root.instance) == QuerySet:
             self.root.instance = self.root.instance[0]
+        food_details_object = FoodDetails.objects.all()
         food_details = FoodDetails.objects.filter(
             food=value, meal=self.root.instance).first()
+        if food_details in self.previous:
+            for food_detail in self.previous:
+                food_details_object = food_details_object.exclude(
+                    pk=food_detail.id)
+            food_details = food_details_object.filter(
+                food=value, meal=self.root.instance).first()
+            self.previous.append(food_details)
+        else:
+            self.previous.append(food_details)
         food_weight = food_details.food_weight
         value = FoodSerializer(value)
         serialized_food_data = value.data
         serialized_food_data['food_details_id'] = str(food_details.id)
         serialized_food_data['food_weight'] = str(food_weight)
+        if(self.index == len(FoodDetails.objects.filter(meal=self.root.instance))):
+            self.previous.clear()
+            self.index = 0
 
         return serialized_food_data
 
