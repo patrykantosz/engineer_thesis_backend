@@ -50,6 +50,8 @@ class MealSerializer(serializers.ModelSerializer):
 
 class MealDateSerializer(serializers.RelatedField):
     def to_representation(self, value):
+        if type(self.root.instance) is AppUser:
+            self.root.instance = self.root.instance.food_history
         if type(self.root.instance) == QuerySet:
             self.root.instance = self.root.instance[0]
         meal_date_object = MealDate.objects.filter(
