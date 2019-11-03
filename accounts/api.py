@@ -168,10 +168,18 @@ class DeleteFoodProductFromMealAPI(generics.DestroyAPIView):
                     error_response = "FoodDetail with id "
                     error_response += str(food_details_id)
                     error_response += " doesn't exist"
-                    return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({
+                        "message": error_response,
+                    }, status=status.HTTP_400_BAD_REQUEST)
                 if(food_details_object):
                     food_details_object.delete()
-                    return Response("Delete food done", status=status.HTTP_200_OK)
+                    return Response({
+                        "message": "Delete food done",
+                    }, status=status.HTTP_200_OK)
                 else:
-                    return Response("Delete food failed", status=status.HTTP_400_BAD_REQUEST)
-        return Response("No query params or query params are wrong", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+                    return Response({
+                        "message": "Delete food failed",
+                    }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            "message": "No query params or query params are wrong",
+        }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
