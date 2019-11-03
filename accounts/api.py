@@ -6,6 +6,7 @@ from .models import AppUser, MealType, FoodDetails, Meal, MealDate
 from food.models import Food
 from food.serializer import FoodSerializer
 from datetime import datetime
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class RegisterAPI(generics.GenericAPIView):
@@ -157,8 +158,15 @@ class DeleteFoodProductFromMealAPI(generics.DestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         food_details_id = request.data.get('food_details_id', False)
-        food_details_object = FoodDetails.objects.get(pk=food_details_id)
+        try:
+            food_details_object = FoodDetails.objects.get(pk=food_details_id)
+        except ObjectDoesNotExist:
+            error_response = "FoodDetail with id "
+            error_response += str(food_details_id)
+            error_response += " doesn't exist"
+            return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
         if(food_details_object):
-            #serializer = FoodDetailsSerializer(food_details_object)
             food_details_object.delete()
-        return Response(status=status.HTTP_200_OK)
+            return Response("Delete food done", status=status.HTTP_200_OK)
+        else:
+            return Response("Delete food failed", status=status.HTTP_400_BAD_REQUEST)
