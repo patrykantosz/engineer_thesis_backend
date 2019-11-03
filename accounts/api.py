@@ -157,16 +157,21 @@ class DeleteFoodProductFromMealAPI(generics.DestroyAPIView):
     ]
 
     def delete(self, request, *args, **kwargs):
-        food_details_id = request.data.get('food_details_id', False)
-        try:
-            food_details_object = FoodDetails.objects.get(pk=food_details_id)
-        except ObjectDoesNotExist:
-            error_response = "FoodDetail with id "
-            error_response += str(food_details_id)
-            error_response += " doesn't exist"
-            return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
-        if(food_details_object):
-            food_details_object.delete()
-            return Response("Delete food done", status=status.HTTP_200_OK)
-        else:
-            return Response("Delete food failed", status=status.HTTP_400_BAD_REQUEST)
+        if(self.request.query_params):
+            food_details_id = self.request.query_params.get(
+                'food_details_id', False)
+            if(food_details_id):
+                try:
+                    food_details_object = FoodDetails.objects.get(
+                        pk=food_details_id)
+                except ObjectDoesNotExist:
+                    error_response = "FoodDetail with id "
+                    error_response += str(food_details_id)
+                    error_response += " doesn't exist"
+                    return Response(error_response, status=status.HTTP_400_BAD_REQUEST)
+                if(food_details_object):
+                    food_details_object.delete()
+                    return Response("Delete food done", status=status.HTTP_200_OK)
+                else:
+                    return Response("Delete food failed", status=status.HTTP_400_BAD_REQUEST)
+        return Response("No query params or query params are wrong", status=status.HTTP_405_METHOD_NOT_ALLOWED)
