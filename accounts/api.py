@@ -172,7 +172,11 @@ class DeleteFoodProductFromMealAPI(generics.DestroyAPIView):
                         "message": error_response,
                     }, status=status.HTTP_400_BAD_REQUEST)
                 if(food_details_object):
+                    meal_parent = food_details_object.meal
                     food_details_object.delete()
+                    meal_parent_food_queryset = meal_parent.food.all()
+                    if(len(meal_parent_food_queryset) == 0):
+                        meal_parent.delete()
                     return Response({
                         "message": "Delete food done",
                     }, status=status.HTTP_200_OK)
