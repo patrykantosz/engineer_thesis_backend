@@ -90,12 +90,24 @@ class FoodDetailsUpdateAPI(generics.UpdateAPIView):
     def partial_update(self, request, *args, **kwargs):
         food_weight = request.data.get('food_weight', False)
         food_details_id = request.data.get('food_details_id', False)
-        instance = FoodDetails.objects.get(pk=food_details_id)
+        try:
+            instance = FoodDetails.objects.get(pk=food_details_id)
+        except ObjectDoesNotExist:
+            error_response = "FoodDetail with id "
+            error_response += str(food_details_id)
+            error_response += " doesn't exist"
+            return Response({
+                "message": error_response,
+            }, status=status.HTTP_400_BAD_REQUEST)
         instance.food_weight = food_weight
         instance.save()
         if(instance.food_weight == food_weight):
-            return Response(status=status.HTTP_200_OK)
-        return Response('Update failed', status=status.HTTP_404_NOT_FOUND)
+            return Response({
+                'message': 'Update done',
+            }, status=status.HTTP_200_OK)
+        return Response({
+            'message': 'Update failed',
+        }, status=status.HTTP_404_NOT_FOUND)
 
 
 class AddMealAPI(generics.GenericAPIView):
