@@ -52,8 +52,8 @@ class MealDate(models.Model):
 
 
 class UserBodyParameters(models.Model):
-    user_weight = models.IntegerField(default=180)
-    user_height = models.IntegerField(default=75)
+    user_weight = models.IntegerField(default=75)
+    user_height = models.IntegerField(default=180)
     user_bmi = models.DecimalField(
         max_digits=4, decimal_places=2, default=23.15)
 
