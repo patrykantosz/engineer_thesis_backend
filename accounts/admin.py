@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import AppUser, UserFoodHistory, Meal, FoodDetails, MealDate
+from .models import AppUser, UserFoodHistory, Meal, FoodDetails, MealDate, UserNutritionsTarget, UserBodyParameters, MealDate, FoodDetails
 
 
 class FoodDetailsInline(admin.TabularInline):
@@ -22,5 +22,9 @@ class UserFoodHistoryAdmin(admin.ModelAdmin):
 
 # Register your models here.
 admin.site.register(AppUser)
+admin.site.register(UserBodyParameters)
+admin.site.register(UserNutritionsTarget)
+admin.site.register(MealDate)
+admin.site.register(FoodDetails)
 admin.site.register(UserFoodHistory, UserFoodHistoryAdmin)
 admin.site.register(Meal, MealAdmin)

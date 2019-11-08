@@ -1,8 +1,8 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FoodDetailsSerializer, MealSerializer, UserFoodHistorySerializer
-from .models import AppUser, MealType, FoodDetails, Meal, MealDate
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FoodDetailsSerializer, MealSerializer, UserFoodHistorySerializer, UserNutritionsTargetSerializer, UserBodyParametersSerializer
+from .models import AppUser, MealType, FoodDetails, Meal, MealDate, UserBodyParameters, UserNutritionsTarget
 from food.models import Food
 from food.serializer import FoodSerializer
 from datetime import datetime
@@ -199,3 +199,29 @@ class DeleteFoodProductFromMealAPI(generics.DestroyAPIView):
         return Response({
             "message": "No query params or query params are wrong",
         }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class UserBodyParametersAPI(generics.RetrieveUpdateAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+    serializer_class = UserBodyParametersSerializer
+
+    def get_object(self):
+        return self.request.user.body_parameters
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+
+class UserNutritionsTargetAPI(generics.RetrieveUpdateAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+    serializer_class = UserNutritionsTargetSerializer
+
+    def get_object(self):
+        return self.request.user.nutritions_target
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)

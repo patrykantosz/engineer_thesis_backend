@@ -51,6 +51,24 @@ class MealDate(models.Model):
     meal_date = models.DateField(default=timezone.now, null=True)
 
 
+class UserBodyParameters(models.Model):
+    user_weight = models.IntegerField(default=180)
+    user_height = models.IntegerField(default=75)
+    user_bmi = models.DecimalField(
+        max_digits=4, decimal_places=2, default=23.15)
+
+
+class UserNutritionsTarget(models.Model):
+    target_calories = models.IntegerField(default=1910)
+    target_carbohydrates = models.IntegerField(default=270)
+    target_proteins = models.IntegerField(default=50)
+    target_fats = models.IntegerField(default=70)
+
+
 class AppUser(AbstractUser):
     food_history = models.ForeignKey(
         UserFoodHistory, on_delete=models.CASCADE, null=True)
+    body_parameters = models.ForeignKey(
+        UserBodyParameters, on_delete=models.CASCADE, null=True)
+    nutritions_target = models.ForeignKey(
+        UserNutritionsTarget, on_delete=models.CASCADE, null=True)

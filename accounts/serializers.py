@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import AppUser, UserFoodHistory, Meal, FoodDetails, MealDate
+from .models import AppUser, UserFoodHistory, Meal, FoodDetails, MealDate, UserBodyParameters, UserNutritionsTarget
 from food.serializer import FoodSerializer
 from django.core import serializers as coreserializers
 from food.models import Food
@@ -75,12 +75,48 @@ class UserFoodHistorySerializer(serializers.ModelSerializer):
         fields = ('id', 'meal')
 
 
+class UserBodyParametersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserBodyParameters
+        fields = '__all__'
+
+    def update(self, instance, validated_data):
+        instance.user_weight = validated_data.get(
+            'user_weight', instance.user_weight)
+        instance.user_height = validated_data.get(
+            'user_height', instance.user_height)
+        instance.user_bmi = validated_data.get('user_bmi', instance.user_bmi)
+        instance.save()
+        return instance
+
+
+class UserNutritionsTargetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserNutritionsTarget
+        fields = '__all__'
+
+    def update(self, instance, validated_data):
+        instance.target_calories = validated_data.get(
+            'target_calories', instance.target_calories)
+        instance.target_carbohydrates = validated_data.get(
+            'target_carbohydrates', instance.target_carbohydrates)
+        instance.target_proteins = validated_data.get(
+            'target_proteins', instance.target_proteins)
+        instance.target_fats = validated_data.get(
+            'target_fats', instance.target_fats)
+        instance.save()
+        return instance
+
+
 class UserSerializer(serializers.ModelSerializer):
     food_history = UserFoodHistorySerializer()
+    body_parameters = UserBodyParametersSerializer()
+    nutritions_target = UserNutritionsTargetSerializer()
 
     class Meta:
         model = AppUser
-        fields = ('id', 'username', 'email', 'food_history')
+        fields = ('id', 'username', 'email', 'body_parameters',
+                  'nutritions_target', 'food_history')
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -91,8 +127,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_food_history = UserFoodHistory.objects.create()
+        user_body_parameters = UserBodyParameters.objects.create()
+        user_nutritions_target = UserNutritionsTarget.objects.create()
         user = AppUser.objects.create_user(
-            validated_data['username'], validated_data['email'], validated_data['password'], food_history=user_food_history)
+            validated_data['username'], validated_data['email'], validated_data['password'], food_history=user_food_history, body_parameters=user_body_parameters, nutritions_target=user_nutritions_target)
 
         return user
 
